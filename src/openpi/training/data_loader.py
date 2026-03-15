@@ -137,21 +137,17 @@ def create_torch_dataset(
     if repo_id == "fake":
         return FakeDataset(model_config, num_samples=1024)
 
-    #dataset_meta = lerobot_dataset.LeRobotDatasetMetadata(repo_id)
-    #dataset = lerobot_dataset.LeRobotDataset(
-    #    data_config.repo_id,
-    #    delta_timestamps={
-    #        key: [t / dataset_meta.fps for t in range(action_horizon)] for key in data_config.action_sequence_keys
-    #    },
-    #)
-    dataset = lerobot_dataset.LeRobotDataset(
-    data_config.repo_id,
-    delta_timestamps={
-        key: [t / dataset_meta.fps for t in range(action_horizon)]
-        for key in data_config.action_sequence_keys
-    },
-    video_backend="none",   # ← disable TorchCodec completely
-)
+    dataset_meta = lerobot_dataset.LeRobotDatasetMetadata(repo_id)
+    dataset_kwargs = {
+        "delta_timestamps": {
+            key: [t / dataset_meta.fps for t in range(action_horizon)]
+            for key in data_config.action_sequence_keys
+        }
+    }
+    if data_config.video_backend:
+        dataset_kwargs["video_backend"] = data_config.video_backend
+
+    dataset = lerobot_dataset.LeRobotDataset(data_config.repo_id, **dataset_kwargs)
 
 
     if data_config.prompt_from_task:
