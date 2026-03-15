@@ -137,16 +137,40 @@ def create_torch_dataset(
     if repo_id == "fake":
         return FakeDataset(model_config, num_samples=1024)
 
-    dataset_meta = lerobot_dataset.LeRobotDatasetMetadata(repo_id)
+    #dataset_meta = lerobot_dataset.LeRobotDatasetMetadata(repo_id)
+    #dataset = lerobot_dataset.LeRobotDataset(
+    #    data_config.repo_id,
+    #    delta_timestamps={
+    #        key: [t / dataset_meta.fps for t in range(action_horizon)] for key in data_config.action_sequence_keys
+    #    },
+    #)
     dataset = lerobot_dataset.LeRobotDataset(
-        data_config.repo_id,
-        delta_timestamps={
-            key: [t / dataset_meta.fps for t in range(action_horizon)] for key in data_config.action_sequence_keys
-        },
-    )
+    data_config.repo_id,
+    delta_timestamps={
+        key: [t / dataset_meta.fps for t in range(action_horizon)]
+        for key in data_config.action_sequence_keys
+    },
+    video_backend="none",   # ← disable TorchCodec completely
+)
+
 
     if data_config.prompt_from_task:
-        dataset = TransformedDataset(dataset, [_transforms.PromptFromLeRobotTask(dataset_meta.tasks)])
+        tasks = dataset_meta.tasks
+        if isinstance(tasks, dict):
+            task_mapping = {int(k): str(v) for k, v in tasks.items()}
+        elif hasattr(tasks, "iterrows"):
+            # Newer versions of lerobot expose tasks as a pandas.DataFrame with task labels in the index.
+            task_mapping = {
+                int(row["task_index"]): str(task)
+                for task, row in tasks.iterrows()
+                if "task_index" in row
+            }
+            if not task_mapping:
+                raise ValueError("Failed to parse task mapping from LeRobot metadata.")
+        else:
+            raise TypeError("Unsupported tasks format returned by LeRobotDatasetMetadata.tasks")
+
+        dataset = TransformedDataset(dataset, [_transforms.PromptFromLeRobotTask(task_mapping)])
 
     return dataset
 

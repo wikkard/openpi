@@ -244,7 +244,7 @@ class LeRobotSoArmDataConfig(DataConfigFactory):
                     {
                         "observation/images/top": "observation.images.top",
                         "observation/images/wrist": "observation.images.wrist",
-                        "observation/images/front": "observation.images.front",
+                        "observation/images/side": "observation.images.side",
                         "observation/state": "observation.state",
                         "action": "action",
                         "prompt": "prompt",
@@ -299,7 +299,7 @@ class LeRobotLeKiwiDataConfig(DataConfigFactory):
                     {
                         "observation/images/top": "observation.images.top",
                         "observation/images/wrist": "observation.images.wrist",
-                        "observation/images/front": "observation.images.front",
+                        "observation/images/side": "observation.images.side",
                         "observation/state": "observation.state",
                         "action": "action",
                         "prompt": "prompt",
