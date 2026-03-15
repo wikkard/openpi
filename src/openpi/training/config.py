@@ -11,7 +11,6 @@ from typing import Any, Literal, Protocol, TypeAlias
 import etils.epath as epath
 import flax.nnx as nnx
 from typing_extensions import override
-from lerobot_random.vla.pi.config_soarm import LeRobotSoArmDataConfig
 import tyro
 
 import openpi.models.model as _model
